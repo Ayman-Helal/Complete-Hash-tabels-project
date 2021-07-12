@@ -1,6 +1,19 @@
+/* 
+Name:- Ayman Mohamed Helal Abouzeid 
+Sec:- 1         BN:- 38
+Name:- marwan ramzy mohamed
+Sec:- 4         BN:- 7
+Name:- kareem el saed abdel hafez
+Sec:- 3         Bn:- 23
+*/
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define SIZE 20
+
 
 void hashReservation();
 int HashFunction(int a);
@@ -9,22 +22,50 @@ void printHash_withNames();
 void FindInTable_usingName(char name1[25]);
 void DeletFromTable_usingName(char name1[25]);
 
-  struct student {
+
+int keycalc(int day , int month, int year); 
+void createHashtable();
+int hashfunc(int key);
+struct student *search(int key);
+struct student *delete1(struct student* item);
+void display();
+
+
+struct student {
     char name[25];
-    int id;
+    int id,key;
     int date_of_birth[3];
     int score_of_last_year;
     struct student *nextptr;
     }*hash[28];
+ 
+ 
+struct student* hasharr[SIZE];
+struct student* NULLItem;
+struct student* item;   
+void insert(int key, char name[25], int id, int day , int month, int year, int score_of_last_year, int a );    
 
+
+
+//***************************************************Main function**********************************************************************************
 int main()
 {
- char name1[25];
+	
+ 
     int l=1;
-    int E;
+int a,E,G, keey, id, score_of_last_year, key, date_of_birth[3];
+char name[25];
+char name1[25];
 printf("welcome to our system\n");
 printf("**********************************************************************************************************************\n");
-hashReservation();
+fflush(stdin);
+printf("press 1: To use the name as key\n press 2: To use the date of birth as key\n");
+scanf("%d",&G);
+switch(G)
+{
+	case 1:
+		{
+			hashReservation();
 while(l==1){
     printf("**********************************************************************************************************************\n");
     printf("press 1:to insert\n press 2:to search\n press 3: to delete\n press 0: to end the program\n");
@@ -55,11 +96,210 @@ case 0:
 }
 printf("\n Data entered in the table : \n");
 printHash_withNames();
-    return 0;
+		}break;
+		
+		
+case 2:
+{
+	 createHashtable();
+    while(1){
+        int c;
+        printf(" 1. Insert\n 2. Search\n 3. Delete\n 4. Exit\n");
+        scanf("%d", &c);
+        if(c==1){
+        printf("Choose a method: \n 1. Linear probing\n 2. Quadratic probing \n");
+        scanf("%d", &a);
+        printf("Enter name :\n");
+        scanf("%s", name );
+        printf("Enter id:\n");
+        scanf("%d", &id );
+        printf("Enter date of birth:\n");
+        for ( int j = 0; j < 3; ++j)
+            scanf("%d", &date_of_birth[j] );
+        printf("Enter socre:\n");
+        scanf("%d", &score_of_last_year );
+        keey = keycalc( date_of_birth[0], date_of_birth[1], date_of_birth[2]);
+        insert( keey, name, id, date_of_birth[0], date_of_birth[1], date_of_birth[2], score_of_last_year, a);
+        display();
+        }
+        else if(c==2){
+            printf("Enter a key:    (Note: you should enter the sum of day, month and year as a key.)\n");
+            scanf("%d", &keey);
+            item = search(keey);
+            if(item != NULL) {
+                printf("Element found: \n");
+                printf(" (key: %d, Name: %s, ID: %d, Birthdate: %d/%d/%d, Score: %d\n)",item->key,item->name,item->id,item->date_of_birth[0],item->date_of_birth[1],item->date_of_birth[2],item->score_of_last_year);
+            }
+            else {
+                printf("Element not found\n");
+            }
+        }
+        else if(c==3){
+            printf("Enter a key:    (Note: you should enter the sum of day, month and year as a key.)\n");
+            scanf("%d", &keey);
+            item = search(keey);
+            if(item != NULL) {
+                printf("Element found: \n");
+                printf(" (key: %d, Name: %s, ID: %d, Birthdate: %d/%d/%d, Score: %d\n)",item->key,item->name,item->id,item->date_of_birth[0],item->date_of_birth[1],item->date_of_birth[2],item->score_of_last_year);
+                printf("Item is deleted\n");
+                delete1(item);
+            }
+            else {
+                printf("Element not found\n");
+            }
+        }
+        else{
+            display();
+            exit(0);
+        }
+
+    }	}break;
+			
+}
+return 0;
+}
+
+//************************************************************************************************************************************************
+//hashing using birth of date functions
+//**********************************************************************************************************************************************
+int keycalc(int day , int month, int year){
+    int key;
+    key = day + month + year;
+    return key;
+}
+
+//--------------------------------------------------------------------------------
+void createHashtable(){
+    NULLItem = (struct student*) malloc(sizeof(struct student));
+    NULLItem->id = -1;
+    NULLItem->key = -1;
+}
+ //-------------------------------------------------------------------------------
+int hashfunc(int key) {
+   return key % SIZE;
+}
+//----------------------------------------------------------------------------------
+struct student *search(int key) {
+   //get the hash
+   int Index = hashfunc(key);
+
+   //move in array until an empty
+   while(hasharr[Index] != NULL) {
+
+      if(hasharr[Index]->key == key)
+         return hasharr[Index];
+
+      //go to next cell
+      ++Index;
+
+      //wrap around the table
+      Index %= SIZE;
+   }
+
+   return NULL;
+}
+ //-------------------------------------------------------------------------------------------------------------------
+void insert(int key, char name[25], int id, int day , int month, int year, int score_of_last_year, int a ) {
+
+   struct student *item = (struct student*) malloc(sizeof(struct student));
+   strcpy(item->name , name);
+   item->id = id;
+   item->date_of_birth[0] = day;
+   item->date_of_birth[1] = month;
+   item->date_of_birth[2] = year;
+   item->score_of_last_year = score_of_last_year;
+   item->key = key;
+
+   //get the hash
+   int Index = hashfunc(key);
+    int i=0;
+    int oldIndex=Index;
+   //move in array until an empty or deleted cell
+   while(hasharr[Index] != NULL && hasharr[Index]->key != -1) {
+      if(a==1){
+          //Linear probing
+          ++Index;
+          key++;
+          item->key=key;
+      //wrap around the table
+      Index %= SIZE;
+      }
+      else{
+        //Quadratic probing
+      Index=oldIndex;
+      //go to next cell
+      Index=Index+(i*i);
+      printf("Index is %d\n", Index);
+      i++;
+      printf("i is %d\n", i);
+      //wrap around the table
+      Index %= SIZE;
+      }
+   }
+   if(a==2){
+       i=i-1;
+       item->key=key+(i*i);
+   }
+ 
+   hasharr[Index] = item;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+struct student* delete1(struct student* item) {
+   int key = item->key;
+
+   //get the hash
+   int Index = hashfunc(key);
+
+   //move in array until an empty
+   while(hasharr[Index] != NULL) {
+
+      if(hasharr[Index]->key == key) {
+         struct student* temp = hasharr[Index];
+
+         //assign a dummy item at deleted position
+         hasharr[Index] = NULLItem;
+         return temp;
+      }
+
+      //go to next cell
+      ++Index;
+
+      //wrap around the table
+      Index %= SIZE;
+   }
+
+   return NULL;
+}
+
+//------------------------------------------------------------------------------------------------------
+void display() {
+   int i = 0;
+
+   for(i = 0; i<SIZE; i++) {
+
+      if(hasharr[i] != NULL){
+          if(hasharr[i]->id == -1){
+        printf(" ~~ ");
+      }
+      else{
+         printf(" (key: %d, Name: %s, ID: %d, Birthdate: %d,%d,%d, Score: %d)",hasharr[i]->key,hasharr[i]->name,hasharr[i]->id,hasharr[i]->date_of_birth[0],hasharr[i]->date_of_birth[1],hasharr[i]->date_of_birth[2],hasharr[i]->score_of_last_year);
+      }
+
+      }
+      //else if(hasharr[i]->id == -1){
+        //printf(" ~~ ");
+      //}
+      else
+         printf(" ~~ ");
+   }
+
+   printf("\n");
 }
 
 
-
+//hashing using the name as key
+//**************************************************************************************************************************************************************************************************************************************************************************************
 
 void hashReservation()
 {
@@ -68,6 +308,7 @@ for(i=0;i<28;i++)
 hash[i]=NULL;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 
 int HashFunction(int a)
 {
@@ -75,8 +316,7 @@ int HashFunction(int a)
     return index;
 }
 
-
-
+//--------------------------------------------------------------------------------------------------------------------
 void printHash_withNames()
 {
     int i,j,ch;
@@ -111,9 +351,7 @@ void printHash_withNames()
    } }
 }
 
-
-
-
+//----------------------------------------------------------------------------------------------------------------------------------------
 void FindInTable_usingName(char name1[25])
 {
     int k;
@@ -122,7 +360,7 @@ void FindInTable_usingName(char name1[25])
 
 
 // Handling the name
-//------------------------------------------------------------------------------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ch = name1[0];
 printf("Ascii of the input is: %d\n",ch);
 if (ch<=90&ch>=65)
@@ -131,7 +369,7 @@ int index=HashFunction(ch);
 printf("The index is: %d\n",index);
 
 //finding
-//------------------------------------------------------------------------------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if (hash[index]==NULL)
     printf("the program didn't find this name\n");
     else
@@ -164,8 +402,7 @@ printf("the program didn't find this name\n");}
 }
 }
 
-
-
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 void DeletFromTable_usingName(char name1[25])
 {
@@ -175,7 +412,7 @@ void DeletFromTable_usingName(char name1[25])
      
 
 // Handling the name
-//------------------------------------------------------------------------------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     ch = name1[0];
 printf("Ascii of the input is: %d\n",ch);
 if (ch<=90&ch>=65)
@@ -183,8 +420,8 @@ ch=ch+32;
 int index=HashFunction(ch);
 printf("The index is: %d\n",index);
 
-//finding
-//------------------------------------------------------------------------------------------------------------------
+//deleting
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if (hash[index]==NULL)
     printf("the program didn't find this name deleting not possible\n");
     else
@@ -229,8 +466,7 @@ else{
 }
 }
 
-
-
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 void InsertInHash_usingName()
 {
@@ -271,7 +507,7 @@ if(newstu == NULL) //check whether the newstu is NULL and if so no memory alloca
        newstu->score_of_last_year=score;
 }
 // Handling the name
-//------------------------------------------------------------------------------------------------------------------
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ch = name1[0];
 printf("Ascii of the input is: %d\n",ch);
@@ -280,7 +516,7 @@ ch=ch+32;
 int index=HashFunction(ch);
 printf("The index is: %d\n",index);
 
-//--------------------------------------------------------------------------------------------------------------------
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  if(hash[index]==NULL)
    {
      hash[index]= newstu;
